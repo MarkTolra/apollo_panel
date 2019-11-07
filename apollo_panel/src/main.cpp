@@ -27,58 +27,37 @@ const char keymap[ROWS][COLS] = {
   {'*','0','#'}
 };
 
+const int CODE_LENGTH = 3;
+
 byte rowPins[ROWS] = {8, 7, 6, 5};   //connect to the row pinouts of the keypad
 byte colPins[COLS] = {4, 3, 2};      //connect to the column pinouts of the keypad
 
 // //initialize an instance of class NewKeypad
 Keypad customKeypad = Keypad( makeKeymap(keymap), rowPins, colPins, ROWS, COLS); 
 // char getKey();
-int i1,i2,i3,i4;
-char c1,c2,c3,c4;
-String tot;
+char keypad_read();
 
 void setup() {
   Serial.begin(9600);
-  Serial.println("Serial start up");
+  Serial.println("Serial start up"); 
   Wire.begin();
-  pinMode(13, OUTPUT);
-  digitalWrite(13, LOW);
 }
 
+byte x = 0;
+
 void loop() {
-  char customKey = customKeypad.getKey();
-  
-  if (customKey == '*')
-  {
-    Serial.println("Enter code: ");
-    customKey = customKeypad.waitForKey();
-    if (customKey != NO_KEY)
-    {
-      c1 = customKey;
-      Serial.print('*');
-    }
-    customKey = customKeypad.waitForKey();
-    if (customKey != NO_KEY)
-    {
-      c2 = customKey;
-      Serial.print("*");
-    }
-    customKey = customKeypad.waitForKey();
-    if (customKey != NO_KEY)
-    {
-      c3 = customKey;
-      Serial.print("*");
-    }
-    customKey = customKeypad.waitForKey();
-    if (customKey != NO_KEY)
-    {
-      c4 = customKey;
-      Serial.println("*");
-    }
-    tot = (String(c1)+String(c2)+String(c3)+String(c4));
-    
-    Serial.println(tot);
-  }
+  char keypad_output = keypad_read();
+  Wire.beginTransmission(8); // transmit to device #8
+  // Wire.write("x is ");        // sends five bytes
+  // Wire.write(x);              // sends one byte
+  // Wire.endTransmission();    // stop transmitting
+  Serial.println(&keypad_output);
+  // x++;
+  // delay(500);
+  // Wire.beginTransmission(8); // transmit to device #9
+  Wire.write(&keypad_output);              
+  Wire.endTransmission();    // stop transmitting
+  // Serial.println(keypad_output);
 }
 
 uint32_t battMonitor()
@@ -91,3 +70,43 @@ uint32_t battMonitor()
 
   return voltage;
 }
+
+char keypad_read()
+{
+  char c1,c2,c3,c4;
+  char tot;
+
+  // char customKey = customKeypad.getKey();
+  char customKey = customKeypad.waitForKey();
+
+  // int code[CODE_LENGTH] = {};
+
+  if (customKey == '*')
+  {
+    Serial.println("Enter code: ");
+    customKey = customKeypad.waitForKey();
+    if (customKey != NO_KEY)
+    {
+      c1 = customKey;
+      Serial.print(c1);
+    }
+    customKey = customKeypad.waitForKey();
+    if (customKey != NO_KEY)
+    {
+      c2 = customKey;
+      Serial.print(c2);
+    }
+    customKey = customKeypad.waitForKey();
+    if (customKey != NO_KEY)
+    {
+      c3 = customKey;
+      Serial.println(c3);
+    }
+    tot = 'string';
+    // ((c1-48)*100)+((c2-48)*10)+(c3-48);
+    //  c1+c2+c3
+   
+    return tot;
+  }
+}
+
